@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Ticket System Init</title>
+</head>
+<body onload="getTickets()">
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Ticket System Init</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+
+            <li class="nav-item">
+                <button type="button" class="btn btn btn-secondary btn-sm" data-toggle="modal" data-target="#createTicketModal">Create Ticket</button>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0 mr-2" type="submit">Search</button>
+            <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+                <option value="1" selected>by Author ID</option>
+                <option value="2">by Title</option>
+                <option value="3">by Created Date</option>
+            </select>
+
+        </form>
+    </div>
+</nav>
+
+
+<div class="container py-5" id="featured-3">
+    <h2 class="pb-2 border-bottom">All Tickets</h2>
+
+    <div class="container" id="cardContainer">
+        <div class="card-deck mb-5" id="cardDeck">
+<!--            Cards dynamically insert here-->
+        </div>
+    </div>
+
+</div>
+
+
+<!--createTicketModal Start-->
+    <div class="modal" tabindex="-1" role="dialog" id="createTicketModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Ticket</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="cTicketTitle">Title</label>
+                            <input class="form-control" id="cTicketTitle" aria-describedby="titleHelp">
+                            <small id="cTitleHelp" class="form-text text-muted">A title for your ticket</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="cTicketDesc">Description</label>
+                            <input class="form-control" id="cTicketDesc" aria-describedby="descHelp">
+                            <small id="cDescHelp" class="form-text text-muted">A brief description of the ticket</small>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="postTicket()">Create Ticket</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--createTicketModal End-->
+
+
+<!--updateTicketModal Start-->
+<div class="modal" tabindex="-1" role="dialog" id="updateTicketModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Ticket</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="uTicketTitle">Title</label>
+                        <input class="form-control" id="uTicketTitle" aria-describedby="uTitleHelp">
+                        <small id="uTitleHelp" class="form-text text-muted">Change the title for the ticket</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="uTicketDesc">Description</label>
+                        <input class="form-control" id="uTicketDesc" aria-describedby="descHelp">
+                        <small id="uDescHelp" class="form-text text-muted">Change the description of the ticket</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="uTicketStatus">Status</label>
+                        <input class="form-control" id="uTicketStatus" aria-describedby="descHelp">
+                        <small id="uStatusHelp" class="form-text text-muted">Change the status of the ticket</small>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="updateTicketButton" class="btn btn-primary">Update Ticket</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--updateTicketModal End-->
+
+
+<script>
+
+var ticketList = [];
+
+function createCard(ticket){
+
+    return '<div class="card">\n' +
+        '  <div class="card-header">' +
+        '  <h5 class="card-title">' + ticket.id + ' - ' + ticket.title + '</h5>\n' +
+        '  </div>\n' +
+        '  <div class="card-body">\n' +
+        '  <p class="card-text">\n' +
+        ' ' + ticket.status +
+        '  </p>\n' +
+        '  <p class="card-text">\n' +
+        ' ' + ticket.description +
+        '  </p>\n' +
+        '  <a href="#" onclick="populateUpdateModal('+ ticket.id +')" class="btn btn-outline-primary mb-1 mt-1">Update</a>\n' +
+        '  <a href="#" onclick="deleteTicket('+ ticket.id +')" class="btn btn-danger mb-1 mt-1">Delete</a>\n' +
+        '  </div>\n' +
+        '  <div class="card-footer text-muted">' + ticket.authorID + ' - ' + ticket.time_stamp + '</div>\n' +
+        '  </div>';
+}
+
+function getTickets() {
+
+        let count = -1;
+
+        fetch('http://localhost:8083/tickets/')
+        .then(response => {
+            return response.json();
+        })
+        .then(tickets => {
+            for (let ticket of tickets)
+            {
+                count++;
+                ticketList.push(ticket);
+                if (count % 3 === 0){
+                    document.getElementById('cardDeck').removeAttribute('id');
+                    document.getElementById('cardContainer').innerHTML += '<div class="card-deck mt-5 mb-5" id="cardDeck"></div>'
+                }
+                let card = createCard(ticket);
+                document.getElementById('cardDeck').innerHTML += card;
+            }
+        })
+    }
+
+function postTicket() {
+
+        let payload =    {
+            title: document.getElementById("cTicketTitle").value,
+            authorID: 1,
+            description: document.getElementById("cTicketDesc").value,
+            time_stamp: new Date().toLocaleString(),
+            status: "Active"
+        };
+
+        console.log(payload);
+
+        fetch('http://localhost:8083/tickets/', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json())
+            .then(res => {
+                $('#createTicketModal').modal('hide');
+
+                    if (res === true){
+                        if(!alert("Ticket created")){window.location.reload();}
+                    } else {
+                        if(!alert("There was an issue with saving the new ticket - Error " + res)){window.location.reload();}
+                    }
+            })
+    }
+
+    function populateUpdateModal(ticketId){
+
+        ticketList.forEach(ticket => {
+            if (ticket.id === ticketId) {
+                document.getElementById('uTicketTitle').value = ticket.title;
+                document.getElementById('uTicketDesc').value = ticket.description;
+                document.getElementById('uTicketStatus').value = ticket.status;
+                document.getElementById('updateTicketButton').onclick = 'updateTicket(ticketId)';
+                document.getElementById('updateTicketButton').setAttribute( "onClick", "javascript: updateTicket("+ticketId+");" );
+            }
+            });
+        $('#updateTicketModal').modal('show');
+    }
+
+function updateTicket(ticketId) {
+
+    ticketList.forEach(ticket => {
+       if (ticket.id === ticketId){
+           console.log("updating - " + ticket.id)
+
+           let payload =    {
+               id: ticket.id,
+               title: document.getElementById("uTicketTitle").value,
+               authorID: ticket.authorID,
+               description: document.getElementById("uTicketDesc").value,
+               time_stamp: ticket.time_stamp,
+               status: document.getElementById("uTicketStatus").value
+           };
+
+           console.log(payload);
+
+           fetch('http://localhost:8083/tickets/' + ticketId, {
+               method: 'put',
+               headers: {
+                   'Accept': 'application/json, text/plain, */*',
+                   'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(payload)
+           }).then(res => res.json())
+               .then(res => {
+                   $('#updateTicketModal').modal('hide');
+
+                   if (res === true){
+                       if(!alert("Ticket updated")){window.location.reload();}
+                   } else {
+                       if(!alert("There was an issue with updating the ticket - Error " + res)){window.location.reload();}
+                   }
+               })
+       }
+    });
+
+}
+
+function deleteTicket(id) {
+
+        if (confirm("Are you sure you want to delete this ticket?")) {
+            fetch('http://localhost:8083/tickets/' + id, {
+                method: 'delete'
+            }).then(res => res.json())
+                .then(res => console.log(res));
+
+            //TODO don't use this
+            location.reload();
+        }
+    }
+</script>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
+
+<!--
+Client Web Page -> Exp API - process APi -> System API
+                      View      Logic        Permissions/Roles
+-->
